@@ -9,7 +9,10 @@
     <Import_RootNamespace>Polly.Contrib.WaitAndRetry.SharedSpecs</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)BackoffSpecs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExponentialBackoffSpecs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LinearBackoffSpecs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConstantBackoffSpecs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DecorrelatedJitterBackoffSpecs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConcurrentRandomSpecs.cs" />
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@ namespace Polly.Contrib.WaitAndRetry
 {
     /// <summary>
     /// A random number generator with a Uniform distribution that is thread-safe (via locking).
-    /// Can be instantiated with a custom <see cref="int"/> seed to make it act deterministically.
+    /// Can be instantiated with a custom <see cref="int"/> seed to make it emit deterministically.
     /// </summary>
     public sealed class ConcurrentRandom
     {

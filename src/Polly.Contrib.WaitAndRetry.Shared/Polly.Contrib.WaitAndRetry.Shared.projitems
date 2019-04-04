@@ -9,6 +9,10 @@
     <Import_RootNamespace>Polly.Contrib.WaitAndRetry.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Backoff.DecorrelatedJitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Backoff.Linear.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Backoff.Exponential.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Backoff.Constant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Backoff.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConcurrentRandom.cs" />
   </ItemGroup>

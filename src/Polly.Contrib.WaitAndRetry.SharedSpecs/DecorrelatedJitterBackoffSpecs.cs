@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Polly.Contrib.WaitAndRetry.Specs
 {
-    public sealed class BackoffSpecs
+    public sealed class DecorrelatedJitterBackoffSpecs
     {
         [Fact]
         public void Backoff_WithMinDelayLessThanZero_ThrowsException()
