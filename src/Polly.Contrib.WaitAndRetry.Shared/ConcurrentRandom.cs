@@ -7,7 +7,7 @@ namespace Polly.Contrib.WaitAndRetry
     /// A random number generator with a Uniform distribution that is thread-safe (via locking).
     /// Can be instantiated with a custom <see cref="int"/> seed to make it act deterministically.
     /// </summary>
-    internal sealed class ConcurrentRandom
+    public sealed class ConcurrentRandom
     {
         // Singleton approach is per MS best-practices.
         // https://docs.microsoft.com/en-us/dotnet/api/system.random?view=netframework-4.7.2#the-systemrandom-class-and-thread-safety
