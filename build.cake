@@ -19,6 +19,9 @@ var configuration = Argument<string>("configuration", "Release");
 
 #addin "Cake.FileHelpers"
 #addin "System.Text.Json"
+#addin nuget:?package=Cake.Yaml
+#addin nuget:?package=YamlDotNet&version=5.2.1
+
 using System.Text.Json;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,7 +29,7 @@ using System.Text.Json;
 ///////////////////////////////////////////////////////////////////////////////
 
 var projectName = "Polly.Contrib.WaitAndRetry";
-var keyName = "Polly.snk";
+var keyName = projectName + ".snk";
 
 var solutions = GetFiles("./**/*.sln");
 var solutionPaths = solutions.Select(solution => solution.GetDirectory());
@@ -43,14 +46,10 @@ var nuspecDestFile = buildDir + File(nuspecFilename);
 var nupkgDestDir = artifactsDir + Directory("nuget-package");
 var snkFile = srcDir + File(keyName);
 
-var projectToNugetFolderMap = new Dictionary<string, string[]>() {
-    { "NetStandard11", new [] {"netstandard1.1"} },
-    { "NetStandard20", new [] {"netstandard2.0"} },
-};
-
 // Gitversion
 var gitVersionPath = ToolsExePath("GitVersion.exe");
 Dictionary<string, object> gitVersionOutput;
+var gitVersionConfigFilePath = "./GitVersionConfig.yaml";
 
 // Versioning
 string nugetVersion;
@@ -61,6 +60,13 @@ string assemblySemver;
 // StrongNameSigner
 var strongNameSignerPath = ToolsExePath("StrongNameSigner.Console.exe");
 
+///////////////////////////////////////////////////////////////////////////////
+// INNER CLASSES
+///////////////////////////////////////////////////////////////////////////////
+class GitVersionConfigYaml
+{
+    public string NextVersion { get; set; }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -68,6 +74,7 @@ var strongNameSignerPath = ToolsExePath("StrongNameSigner.Console.exe");
 
 Setup(_ =>
 {
+    Information("==============================");
     Information("");
     Information(" ██████╗  ██████╗ ██╗     ██╗  ██╗   ██╗");
     Information(" ██╔══██╗██╔═══██╗██║     ██║  ╚██╗ ██╔╝");
@@ -77,6 +84,9 @@ Setup(_ =>
     Information(" ╚═╝      ╚═════╝ ╚══════╝╚══════╝╚═╝   ");
     Information(" Polly.Contrib.WaitAndRetry")
     Information(" ");
+    Information("Starting the cake build script");
+    Information("Building: " + projectName);
+    Information("==============================");
 });
 
 Teardown(_ =>
@@ -126,13 +136,29 @@ Task("__UpdateAssemblyVersionInformation")
     var gitVersionSettings = new ProcessSettings()
         .SetRedirectStandardOutput(true);
 
-    IEnumerable<string> outputLines;
-    StartProcess(gitVersionPath, gitVersionSettings, out outputLines);
+    try {
+        IEnumerable<string> outputLines;
+        StartProcess(gitVersionPath, gitVersionSettings, out outputLines);
 
-    var output = string.Join("\n", outputLines);
-    gitVersionOutput = new JsonParser().Parse<Dictionary<string, object>>(output);
+        var output = string.Join("\n", outputLines);
+        gitVersionOutput = new JsonParser().Parse<Dictionary<string, object>>(output);
+    }
+    catch
+    {
+        Information("Error reading git version information. Build may be running outside of a git repo. Falling back to version specified in " + gitVersionConfigFilePath);
 
-    Information("Updated GlobalAssemblyInfo");
+        string gitVersionYamlString = System.IO.File.ReadAllText(gitVersionConfigFilePath);
+        GitVersionConfigYaml deserialized = DeserializeYaml<GitVersionConfigYaml>(gitVersionYamlString.Replace("next-version", "NextVersion"));
+        string gitVersionConfig = deserialized.NextVersion;
+
+        gitVersionOutput = new Dictionary<string, object>{
+            { "NuGetVersion", gitVersionConfig + "-NotFromGitRepo" },
+            { "FullSemVer", gitVersionConfig },
+            { "AssemblySemVer", gitVersionConfig },
+            { "Major", gitVersionConfig.Split('.')[0] },
+        };
+
+    }
 
     Information("");
     Information("Obtained raw version info for package versioning:");
@@ -161,24 +187,22 @@ Task("__UpdateDotNetStandardAssemblyVersionNumber")
 
     var attributeToValueMap = new Dictionary<string, string>() {
         { "AssemblyVersion", assemblyVersion },
-        { "AssemblyFileVersion", assemblySemver },
-        { "AssemblyInformationalVersion", assemblySemver },
+        { "FileVersion", assemblySemver },
+        { "InformationalVersion", assemblySemver },
+        { "Version", nugetVersion },
+        { "PackageVersion", nugetVersion },
     };
 
-    var assemblyInfosToUpdate = GetFiles("./src/**/Properties/AssemblyInfo.cs")
-        .Select(f => f.FullPath)
-        .Where(f => !f.Contains("Specs"));
+    var csproj = File("./src/" + projectName + "/" + projectName + ".csproj");
 
     foreach(var attributeMap in attributeToValueMap) {
         var attribute = attributeMap.Key;
         var value = attributeMap.Value;
 
-        foreach(var assemblyInfo in assemblyInfosToUpdate) {
-            var replacedFiles = ReplaceRegexInFiles(assemblyInfo, attribute + "[(]\".*\"[)]", attribute + "(\"" + value +"\")");
-            if (!replacedFiles.Any())
-            {
-                throw new Exception($"{attribute} attribute could not be updated in {assemblyInfo}.");
-            }
+        var replacedFiles = ReplaceRegexInFiles(csproj, $@"\<{attribute}\>[^\<]*\</{attribute}\>", $@"<{attribute}>{value}</{attribute}>");
+        if (!replacedFiles.Any())
+        {
+            throw new Exception($"{attribute} version could not be updated in {csproj}.");
         }
     }
 
@@ -222,16 +246,12 @@ Task("__RunTests")
 Task("__CopyOutputToNugetFolder")
     .Does(() =>
 {
-    foreach(var project in projectToNugetFolderMap.Keys) {
-        var sourceDir = srcDir + Directory(projectName + "." + project) + Directory("bin") + Directory(configuration);
+    var sourceDir = srcDir + Directory(projectName) + Directory("bin") + Directory(configuration);
 
-        foreach(var targetFolder in projectToNugetFolderMap[project]) {
-            var destDir = buildDir + Directory("lib");
+    var destDir = buildDir + Directory("lib");
 
-            Information("Copying {0} -> {1}.", sourceDir, destDir);
-            CopyDirectory(sourceDir, destDir);
-       }
-    }
+    Information("Copying {0} -> {1}.", sourceDir, destDir);
+    CopyDirectory(sourceDir, destDir);
 
     CopyFile(nuspecSrcFile, nuspecDestFile);
 });

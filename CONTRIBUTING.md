@@ -1,2 +1,3 @@
-Please see our Instructions for Contributing in the [ReadMe](https://github.com/App-vNext/Polly#instructions-for-contributing) and [wiki](https://github.com/App-vNext/Polly/wiki/Git-Workflow).
+Polly.Contrib hosts contributions to the Polly project by the community.
 
+See the main readme for how to contribute to Polly.Contrib.

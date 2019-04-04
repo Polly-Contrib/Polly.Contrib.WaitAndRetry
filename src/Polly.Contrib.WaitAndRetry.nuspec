@@ -2,26 +2,28 @@
 <package>
   <metadata>
     <owners>App vNext</owners>
-    <authors>Michael Wolfenden, App vNext</authors>
+    <authors>Grant Dickinson ,App vNext</authors>
     <description>
       Polly is a .NET Standard 1.1 and .NET Standard 2.0 library that allows developers to express resilience and transient fault handling policies such as Retry, Circuit Breaker, Timeout, Bulkhead Isolation and Fallback in a fluent and thread-safe manner.
     </description>
     <language>en-US</language>
-    <licenseUrl>https://raw.github.com/App-vNext/Polly/master/LICENSE.txt</licenseUrl>
+    <license type="expression">BSD-3-Clause</license>
     <iconUrl>https://raw.github.com/App-vNext/Polly/master/Polly.png</iconUrl>
-    <projectUrl>https://github.com/App-vNext/Polly</projectUrl>
-    <tags>Exception Handling Resilience Transient Fault Policy Circuit Breaker CircuitBreaker Retry Wait Cache Cache-aside Bulkhead Fallback Timeout Throttle Parallelization</tags>
-    <copyright>Copyright © 2018, App vNext</copyright>
+    <projectUrl>https://github.com/Polly-Contrib/Polly.Contrib.BlankTemplate</projectUrl>
+    <copyright>Copyright © 2019, App vNext and contributors</copyright>
     <releaseNotes>
-     0.0.1
-     ---------------------
-     - Initial commit
-   </releaseNotes>
+      0.1.0
+      ---------------------
+      - Initial launch
+    </releaseNotes>
     <dependencies>
       <group targetFramework="netstandard1.1">
         <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="Polly" version="7.0.3" />
       </group>
-      <group targetFramework="netstandard2.0"/>
+      <group targetFramework="netstandard2.0">
+        <dependency id="Polly" version="7.0.3" />
+      </group>
     </dependencies>
   </metadata>
   <files>

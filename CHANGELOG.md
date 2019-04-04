@@ -1,3 +1,4 @@
-## 0.0.1
+# Polly.Contrib.BlankTemplate changelog
 
-- Initial commit
+## 0.1.0
+- First version
