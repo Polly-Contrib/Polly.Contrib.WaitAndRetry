@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Polly.Contrib.WaitAndRetry
 {
     /// <summary>
@@ -5,5 +8,9 @@ namespace Polly.Contrib.WaitAndRetry
     /// </summary>
     public static partial class Backoff
     {
+        private static IEnumerable<TimeSpan> Empty()
+        {
+            yield break;
+        }
     }
 }

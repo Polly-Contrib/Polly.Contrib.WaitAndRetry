@@ -23,11 +23,7 @@ namespace Polly.Contrib.WaitAndRetry
             if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
 
             if (retryCount == 0)
-#if NETSTANDARD1_1
-                return new TimeSpan[0];
-#else
-                return Array.Empty<TimeSpan>();
-#endif
+                return Empty();
 
             return Enumerate(minDelay, maxDelay, retryCount, fastFirst, new ConcurrentRandom(seed));
 
