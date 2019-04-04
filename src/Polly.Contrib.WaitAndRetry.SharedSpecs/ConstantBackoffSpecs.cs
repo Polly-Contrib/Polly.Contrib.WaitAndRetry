@@ -8,53 +8,31 @@ namespace Polly.Contrib.WaitAndRetry.Specs
     public sealed class ConstantBackoffSpecs
     {
         [Fact]
-        public void Backoff_WithMinDelayLessThanZero_ThrowsException()
+        public void Backoff_WithDelayLessThanZero_ThrowsException()
         {
             // Arrange
-            var minDelay = new TimeSpan(-1);
-            var maxDelay = new TimeSpan(0);
-            int retryCount = 3;
-            bool fastFirst = false;
-            int seed = 1;
+            var delay = new TimeSpan(-1);
+            const int retryCount = 3;
+            const bool fastFirst = false;
 
             // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
+            Action act = () => Backoff.ConstantBackoff(delay, retryCount, fastFirst);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
-                .And.ParamName.Should().Be("minDelay");
-        }
-
-        [Fact]
-        public void Backoff_WithMaxDelayLessThanMinDelay_ThrowsException()
-        {
-            // Arrange
-            var minDelay = TimeSpan.FromMilliseconds(1);
-            var maxDelay = TimeSpan.FromMilliseconds(0);
-            int retryCount = 3;
-            bool fastFirst = false;
-            int seed = 1;
-
-            // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
-
-            // Assert
-            act.Should().Throw<ArgumentOutOfRangeException>()
-                .And.ParamName.Should().Be("maxDelay");
+                .And.ParamName.Should().Be("delay");
         }
 
         [Fact]
         public void Backoff_WithRetryCountLessThanZero_ThrowsException()
         {
             // Arrange
-            var minDelay = TimeSpan.FromMilliseconds(1);
-            var maxDelay = TimeSpan.FromMilliseconds(2);
-            int retryCount = -1;
-            bool fastFirst = false;
-            int seed = 1;
+            var delay = TimeSpan.FromMilliseconds(1);
+            const int retryCount = -1;
+            const bool fastFirst = false;
 
             // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
+            Action act = () => Backoff.ConstantBackoff(delay, retryCount, fastFirst);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
@@ -65,14 +43,12 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         public void Backoff_WithRetryEqualToZero_ResultIsEmpty()
         {
             // Arrange
-            var minDelay = TimeSpan.FromMilliseconds(1);
-            var maxDelay = TimeSpan.FromMilliseconds(2);
-            int retryCount = 0;
-            bool fastFirst = false;
-            int seed = 1;
+            var delay = TimeSpan.FromMilliseconds(1);
+            const int retryCount = 0;
+            const bool fastFirst = false;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
+            IEnumerable<TimeSpan> result = Backoff.ConstantBackoff(delay, retryCount, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
@@ -83,56 +59,50 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         public void Backoff_WithFastFirstEqualToTrue_ResultIsZero()
         {
             // Arrange
-            var minDelay = TimeSpan.FromMilliseconds(1);
-            var maxDelay = TimeSpan.FromMilliseconds(2);
-            int retryCount = 3;
-            bool fastFirst = true;
-            int seed = 1;
+            var delay = TimeSpan.FromMilliseconds(1);
+            const int retryCount = 3;
+            const bool fastFirst = true;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
+            IEnumerable<TimeSpan> result = Backoff.ConstantBackoff(delay, retryCount, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().HaveCount(3);
+            result.Should().HaveCount(retryCount);
 
             bool first = true;
             foreach (TimeSpan timeSpan in result)
             {
                 if (first)
                 {
-                    timeSpan.Should().Be(TimeSpan.FromMilliseconds(0));
+                    timeSpan.Should().Be(TimeSpan.Zero);
                     first = false;
                 }
                 else
                 {
-                    timeSpan.Should().BeGreaterOrEqualTo(minDelay);
-                    timeSpan.Should().BeLessOrEqualTo(maxDelay);
+                    timeSpan.Should().Be(delay);
                 }
             }
         }
 
         [Fact]
-        public void Backoff_WithMinDelayEqualTo10AndMaxDelayEqualTo100_ResultIsInRange()
+        public void Backoff_ResultIsConstant()
         {
             // Arrange
-            var minDelay = TimeSpan.FromMilliseconds(10);
-            var maxDelay = TimeSpan.FromMilliseconds(100);
-            int retryCount = 3;
-            bool fastFirst = false;
-            int seed = 100;
+            var delay = TimeSpan.FromMilliseconds(10);
+            const int retryCount = 3;
+            const bool fastFirst = false;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
+            IEnumerable<TimeSpan> result = Backoff.ConstantBackoff(delay, retryCount, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().HaveCount(3);
+            result.Should().HaveCount(retryCount);
 
             foreach (TimeSpan timeSpan in result)
             {
-                timeSpan.Should().BeGreaterOrEqualTo(minDelay);
-                timeSpan.Should().BeLessOrEqualTo(maxDelay);
+                timeSpan.Should().Be(delay);
             }
         }
     }

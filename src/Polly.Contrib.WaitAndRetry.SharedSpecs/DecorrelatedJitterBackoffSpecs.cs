@@ -13,9 +13,9 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             // Arrange
             var minDelay = new TimeSpan(-1);
             var maxDelay = new TimeSpan(0);
-            int retryCount = 3;
-            bool fastFirst = false;
-            int seed = 1;
+            const int retryCount = 3;
+            const bool fastFirst = false;
+            const int seed = 1;
 
             // Act
             Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
@@ -31,9 +31,9 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             // Arrange
             var minDelay = TimeSpan.FromMilliseconds(1);
             var maxDelay = TimeSpan.FromMilliseconds(0);
-            int retryCount = 3;
-            bool fastFirst = false;
-            int seed = 1;
+            const int retryCount = 3;
+            const bool fastFirst = false;
+            const int seed = 1;
 
             // Act
             Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
@@ -49,9 +49,9 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             // Arrange
             var minDelay = TimeSpan.FromMilliseconds(1);
             var maxDelay = TimeSpan.FromMilliseconds(2);
-            int retryCount = -1;
-            bool fastFirst = false;
-            int seed = 1;
+            const int retryCount = -1;
+            const bool fastFirst = false;
+            const int seed = 1;
 
             // Act
             Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
@@ -67,9 +67,9 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             // Arrange
             var minDelay = TimeSpan.FromMilliseconds(1);
             var maxDelay = TimeSpan.FromMilliseconds(2);
-            int retryCount = 0;
-            bool fastFirst = false;
-            int seed = 1;
+            const int retryCount = 0;
+            const bool fastFirst = false;
+            const int seed = 1;
 
             // Act
             IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
@@ -85,16 +85,16 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             // Arrange
             var minDelay = TimeSpan.FromMilliseconds(1);
             var maxDelay = TimeSpan.FromMilliseconds(2);
-            int retryCount = 3;
-            bool fastFirst = true;
-            int seed = 1;
+            const int retryCount = 3;
+            const bool fastFirst = true;
+            const int seed = 1;
 
             // Act
             IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().HaveCount(3);
+            result.Should().HaveCount(retryCount);
 
             bool first = true;
             foreach (TimeSpan timeSpan in result)
@@ -113,21 +113,21 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         }
 
         [Fact]
-        public void Backoff_WithMinDelayEqualTo10AndMaxDelayEqualTo100_ResultIsInRange()
+        public void Backoff_ResultIsInRange()
         {
             // Arrange
             var minDelay = TimeSpan.FromMilliseconds(10);
             var maxDelay = TimeSpan.FromMilliseconds(100);
-            int retryCount = 3;
-            bool fastFirst = false;
-            int seed = 100;
+            const int retryCount = 3;
+            const bool fastFirst = false;
+            const int seed = 100;
 
             // Act
             IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, fastFirst, seed);
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().HaveCount(3);
+            result.Should().HaveCount(retryCount);
 
             foreach (TimeSpan timeSpan in result)
             {
