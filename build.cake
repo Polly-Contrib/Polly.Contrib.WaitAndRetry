@@ -18,11 +18,10 @@ var configuration = Argument<string>("configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 #addin "Cake.FileHelpers"
-#addin "System.Text.Json"
 #addin nuget:?package=Cake.Yaml
 #addin nuget:?package=YamlDotNet&version=5.2.1
-
-using System.Text.Json;
+#addin nuget:?package=Cake.Json
+#addin nuget:?package=Newtonsoft.Json&mp;version=9.0.1
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
@@ -132,7 +131,7 @@ Task("__UpdateAssemblyVersionInformation")
         StartProcess(gitVersionPath, gitVersionSettings, out outputLines);
 
         var output = string.Join("\n", outputLines);
-        gitVersionOutput = new JsonParser().Parse<Dictionary<string, object>>(output);
+        gitVersionOutput = DeserializeJson<Dictionary<string, object>>(output);
     }
     catch
     {
