@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Polly.Contrib.WaitAndRetry.Specs
@@ -129,12 +130,12 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         }
 
         [Fact]
-        public void Backoff_ResultIsIncrementing()
+        public void Backoff_ResultIsCorrect()
         {
             // Arrange
             var initialDelay = TimeSpan.FromMilliseconds(10);
             const int retryCount = 5;
-            const double factor = 1;
+            const double factor = 2;
             const bool fastFirst = false;
 
             // Act
@@ -144,12 +145,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             result.Should().NotBeNull();
             result.Should().HaveCount(retryCount);
 
-            TimeSpan prev = TimeSpan.Zero;
-            foreach (TimeSpan timeSpan in result)
-            {
-                timeSpan.Should().BeGreaterThan(prev);
-                prev = timeSpan;
-            }
+            result.Select(t => t.TotalMilliseconds).Should().BeEquivalentTo(new double[] { 10, 30, 50, 70, 90 });
         }
     }
 }

@@ -13,10 +13,10 @@ namespace Polly.Contrib.WaitAndRetry
         /// <param name="minDelay">The minimum duration value to use for the wait before each retry.</param>
         /// <param name="maxDelay">The maximum duration value to use for the wait before each retry.</param>
         /// <param name="retryCount">The maximum number of retries to use, in addition to the original call.</param>
-        /// <param name="fastFirst">Whether the first retry will be immediate or not.</param>
         /// <param name="seed">An optional <see cref="Random"/> seed to use.
         /// If not specified, will use a shared instance with a random seed, per Microsoft recommendation for maximum randomness.</param>
-        public static IEnumerable<TimeSpan> DecorrelatedJitterBackoff(TimeSpan minDelay, TimeSpan maxDelay, int retryCount, bool fastFirst = false, int? seed = null)
+        /// <param name="fastFirst">Whether the first retry will be immediate or not.</param>
+        public static IEnumerable<TimeSpan> DecorrelatedJitterBackoff(TimeSpan minDelay, TimeSpan maxDelay, int retryCount, int? seed = null, bool fastFirst = false)
         {
             if (minDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(minDelay), minDelay, "should be >= 0ms");
             if (maxDelay < minDelay) throw new ArgumentOutOfRangeException(nameof(maxDelay), maxDelay, $"should be >= {minDelay}");
