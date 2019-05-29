@@ -42,7 +42,7 @@
 
   <ItemGroup>
     <!-- The Polly dependency is artificial right now, nothing uses it. -->
-    <!--<PackageReference Include="Polly" Version="7.0.3" />-->
+    <!--<PackageReference Include="Polly" Version="7.1.0" />-->
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
   </ItemGroup>
