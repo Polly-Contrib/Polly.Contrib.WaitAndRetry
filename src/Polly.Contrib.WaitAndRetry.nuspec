@@ -12,9 +12,9 @@
     <projectUrl>https://github.com/Polly-Contrib/Polly.Contrib.WaitAndRetry</projectUrl>
     <copyright>Copyright © 2019, App vNext and contributors</copyright>
     <releaseNotes>
-      0.1.0
+      1.0.0
       ---------------------
-      - Initial launch
+      - Launch version
     </releaseNotes>
     <dependencies>
       <group targetFramework="netstandard1.1">
