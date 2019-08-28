@@ -1,4 +1,4 @@
 # Polly.Contrib.WaitAndRetry changelog
 
-## 0.1.0
-- First version
+## 1.0.0
+- Launch version

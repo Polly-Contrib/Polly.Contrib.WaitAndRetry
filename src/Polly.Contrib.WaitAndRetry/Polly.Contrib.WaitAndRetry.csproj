@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.1.0-v010-0001</Version>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
-    <InformationalVersion>0.1.0.0</InformationalVersion>
-    <PackageVersion>0.1.0-v010-0001</PackageVersion>
+    <Version>1.0.0-bumptov100-0001</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0.0</InformationalVersion>
+    <PackageVersion>1.0.0-bumptov100-0001</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -42,7 +42,7 @@
 
   <ItemGroup>
     <!-- The Polly dependency is artificial right now, nothing uses it. -->
-    <!--<PackageReference Include="Polly" Version="7.0.3" />-->
+    <!--<PackageReference Include="Polly" Version="7.1.0" />-->
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
   </ItemGroup>
