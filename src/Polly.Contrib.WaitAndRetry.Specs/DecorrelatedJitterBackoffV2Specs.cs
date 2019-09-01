@@ -20,30 +20,30 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         public void Backoff_WithMeanFirstDelayLessThanZero_ThrowsException()
         {
             // Arrange
-            var meanFirstDelay = new TimeSpan(-1);
+            var medianFirstDelay = new TimeSpan(-1);
             const int retryCount = 3;
             const bool fastFirst = false;
             const int seed = 1;
 
             // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoffV2(meanFirstDelay, retryCount, seed, fastFirst);
+            Action act = () => Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay, retryCount, seed, fastFirst);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
-                .And.ParamName.Should().Be("meanFirstDelay");
+                .And.ParamName.Should().Be("medianFirstDelay");
         }
 
         [Fact]
         public void Backoff_WithRetryCountLessThanZero_ThrowsException()
         {
             // Arrange
-            var meanFirstDelay = TimeSpan.FromSeconds(1);
+            var medianFirstDelay = TimeSpan.FromSeconds(1);
             const int retryCount = -1;
             const bool fastFirst = false;
             const int seed = 1;
 
             // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoffV2(meanFirstDelay, retryCount, seed, fastFirst);
+            Action act = () => Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay, retryCount, seed, fastFirst);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
@@ -54,13 +54,13 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         public void Backoff_WithRetryEqualToZero_ResultIsEmpty()
         {
             // Arrange
-            var meanFirstDelay = TimeSpan.FromSeconds(2);
+            var medianFirstDelay = TimeSpan.FromSeconds(2);
             const int retryCount = 0;
             const bool fastFirst = false;
             const int seed = 1;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(meanFirstDelay, retryCount, seed, fastFirst);
+            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay, retryCount, seed, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
@@ -71,13 +71,13 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         public void Backoff_WithFastFirstEqualToTrue_ResultIsZero()
         {
             // Arrange
-            var meanFirstDelay = TimeSpan.FromSeconds(2);
+            var medianFirstDelay = TimeSpan.FromSeconds(2);
             const int retryCount = 10;
             const bool fastFirst = true;
             const int seed = 1;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(meanFirstDelay, retryCount, seed, fastFirst);
+            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay, retryCount, seed, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
@@ -96,7 +96,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
                 else
                 {
                     t++;
-                    AssertOnRetryDelayForTry(t, timeSpan, meanFirstDelay);
+                    AssertOnRetryDelayForTry(t, timeSpan, medianFirstDelay);
                 }
             }
         }
@@ -105,13 +105,13 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         public void Backoff_ResultIsInRange()
         {
             // Arrange
-            var meanFirstDelay = TimeSpan.FromSeconds(1);
+            var medianFirstDelay = TimeSpan.FromSeconds(1);
             const int retryCount = 6;
             const bool fastFirst = false;
             const int seed = 23456;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(meanFirstDelay, retryCount, seed, fastFirst);
+            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay, retryCount, seed, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
@@ -122,7 +122,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             foreach (TimeSpan timeSpan in result)
             {
                 t++;
-                AssertOnRetryDelayForTry(t, timeSpan, meanFirstDelay);
+                AssertOnRetryDelayForTry(t, timeSpan, medianFirstDelay);
             }
         }
 
@@ -133,12 +133,12 @@ namespace Polly.Contrib.WaitAndRetry.Specs
         public void Backoff_ResultIsInRange_WideTest(int seed)
         {
             // Arrange
-            var meanFirstDelay = TimeSpan.FromSeconds(3);
+            var medianFirstDelay = TimeSpan.FromSeconds(3);
             const int retryCount = 6;
             const bool fastFirst = false;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(meanFirstDelay, retryCount, seed, fastFirst);
+            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay, retryCount, seed, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
@@ -149,19 +149,19 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             foreach (TimeSpan timeSpan in result)
             {
                 t++;
-                AssertOnRetryDelayForTry(t, timeSpan, meanFirstDelay);
+                AssertOnRetryDelayForTry(t, timeSpan, medianFirstDelay);
             }
         }
 
-        private void AssertOnRetryDelayForTry(int t, TimeSpan calculatedDelay, TimeSpan meanFirstDelay)
+        private void AssertOnRetryDelayForTry(int t, TimeSpan calculatedDelay, TimeSpan medianFirstDelay)
         {
-            /*testOutputHelper.WriteLine($"Try {t}, delay: {calculatedDelay.TotalSeconds} seconds; given mean first delay {meanFirstDelay.TotalSeconds} seconds.");*/
+            /*testOutputHelper.WriteLine($"Try {t}, delay: {calculatedDelay.TotalSeconds} seconds; given median first delay {medianFirstDelay.TotalSeconds} seconds.");*/
 
             calculatedDelay.Should().BeGreaterOrEqualTo(TimeSpan.Zero);
 
             int upperLimitFactor = t < 2 ? (int)Math.Pow(2, t + 1) : (int)(Math.Pow(2, t + 1) - Math.Pow(2, t - 1));
 
-            calculatedDelay.Should().BeLessOrEqualTo(TimeSpan.FromTicks(meanFirstDelay.Ticks * upperLimitFactor));
+            calculatedDelay.Should().BeLessOrEqualTo(TimeSpan.FromTicks(medianFirstDelay.Ticks * upperLimitFactor));
         }
     }
 }
