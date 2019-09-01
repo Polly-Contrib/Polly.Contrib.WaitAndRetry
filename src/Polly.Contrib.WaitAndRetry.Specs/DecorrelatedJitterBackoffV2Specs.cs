@@ -30,7 +30,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
-                .And.ParamName.Should().Be("medianFirstDelay");
+                .And.ParamName.Should().Be("medianFirstRetryDelay");
         }
 
         [Fact]
