@@ -29,6 +29,9 @@ namespace Polly.Contrib.WaitAndRetry
 
             return Enumerate(medianFirstRetryDelay, retryCount, fastFirst, new ConcurrentRandom(seed));
 
+            // The original author/credit for this jitter formula is @george-polevoy . Jitter formula used with permission as described at https://github.com/App-vNext/Polly/issues/530#issuecomment-526555979 
+            // Minor adaptations (pFactor = 4.0 and rpScalingFactor = 1 / 1.4d) by @reisenberger, to scale the formula output for easier parameterisation to users.
+
             IEnumerable<TimeSpan> Enumerate(TimeSpan scaleFirstTry, int maxRetries, bool fast, ConcurrentRandom random)
             {
                 // A factor used within the formula to help smooth the first calculated delay.
