@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Polly.Contrib.WaitAndRetry
 {
-    partial class Backoff // .DecorrelatedJitter
+    partial class Backoff // .AwsDecorrelatedJitter
     {
         /// <summary>
         /// Generates sleep durations in an jittered manner, making sure to mitigate any correlations.
         /// For example: 117ms, 236ms, 141ms, 424ms, ...
-        /// For background, see https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/.
+        /// Per the formula from https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/.
         /// </summary>
         /// <param name="minDelay">The minimum duration value to use for the wait before each retry.</param>
         /// <param name="maxDelay">The maximum duration value to use for the wait before each retry.</param>
@@ -16,7 +16,7 @@ namespace Polly.Contrib.WaitAndRetry
         /// <param name="seed">An optional <see cref="Random"/> seed to use.
         /// If not specified, will use a shared instance with a random seed, per Microsoft recommendation for maximum randomness.</param>
         /// <param name="fastFirst">Whether the first retry will be immediate or not.</param>
-        public static IEnumerable<TimeSpan> DecorrelatedJitterBackoff(TimeSpan minDelay, TimeSpan maxDelay, int retryCount, int? seed = null, bool fastFirst = false)
+        public static IEnumerable<TimeSpan> AwsDecorrelatedJitterBackoff(TimeSpan minDelay, TimeSpan maxDelay, int retryCount, int? seed = null, bool fastFirst = false)
         {
             if (minDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(minDelay), minDelay, "should be >= 0ms");
             if (maxDelay < minDelay) throw new ArgumentOutOfRangeException(nameof(maxDelay), maxDelay, $"should be >= {minDelay}");

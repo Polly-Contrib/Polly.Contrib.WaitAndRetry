@@ -15,6 +15,9 @@ namespace Polly.Contrib.WaitAndRetry
         // Also note that in concurrency testing, using a 'new Random()' for every thread ended up
         // being highly correlated. On NetFx this is maybe due to the same seed somehow being used
         // in each instance, but either way the singleton approach mitigated the problem.
+
+        // For more discussion of different approaches to randomization in concurrent scenarios: https://github.com/App-vNext/Polly/issues/530#issuecomment-439680613
+
         private static readonly Random s_random = new Random();
         private readonly Random _random;
 

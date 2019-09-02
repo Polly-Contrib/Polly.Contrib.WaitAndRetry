@@ -1,11 +1,12 @@
 ﻿using FluentAssertions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Polly.Contrib.WaitAndRetry.Specs
 {
-    public sealed class DecorrelatedJitterBackoffSpecs
+    public sealed class AwsDecorrelatedJitterBackoffSpecs
     {
         [Fact]
         public void Backoff_WithMinDelayLessThanZero_ThrowsException()
@@ -18,7 +19,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             const int seed = 1;
 
             // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
+            Action act = () => Backoff.AwsDecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
@@ -36,7 +37,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             const int seed = 1;
 
             // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
+            Action act = () => Backoff.AwsDecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
@@ -54,7 +55,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             const int seed = 1;
 
             // Act
-            Action act = () => Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
+            Action act = () => Backoff.AwsDecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>()
@@ -72,7 +73,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             const int seed = 1;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
+            IEnumerable<TimeSpan> result = Backoff.AwsDecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
@@ -90,10 +91,11 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             const int seed = 1;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
+            IEnumerable<TimeSpan> result = Backoff.AwsDecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
+            result = result.ToList();
             result.Should().HaveCount(retryCount);
 
             bool first = true;
@@ -123,10 +125,11 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             const int seed = 100;
 
             // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
+            IEnumerable<TimeSpan> result = Backoff.AwsDecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
 
             // Assert
             result.Should().NotBeNull();
+            result = result.ToList();
             result.Should().HaveCount(retryCount);
 
             foreach (TimeSpan timeSpan in result)
