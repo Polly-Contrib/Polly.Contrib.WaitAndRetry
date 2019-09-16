@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polly.Contrib.WaitAndRetry"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polly.Contrib.WaitAndRetry.Specs", "Polly.Contrib.WaitAndRetry.Specs\Polly.Contrib.WaitAndRetry.Specs.csproj", "{ED587F9F-BBE6-4715-9FAA-BAAEFE288A73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecorrelatedJitterV2Explorer", "DecorrelatedJitterV2Explorer\DecorrelatedJitterV2Explorer.csproj", "{A61328AE-988A-4D99-81DC-59780A610555}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{ED587F9F-BBE6-4715-9FAA-BAAEFE288A73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED587F9F-BBE6-4715-9FAA-BAAEFE288A73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED587F9F-BBE6-4715-9FAA-BAAEFE288A73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A61328AE-988A-4D99-81DC-59780A610555}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A61328AE-988A-4D99-81DC-59780A610555}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A61328AE-988A-4D99-81DC-59780A610555}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A61328AE-988A-4D99-81DC-59780A610555}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
