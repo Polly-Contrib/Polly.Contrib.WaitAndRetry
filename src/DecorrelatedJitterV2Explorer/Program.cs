@@ -29,7 +29,7 @@ namespace DecorrelatedJitterV2Explorer
             var maxRetries = 6;
 
             // Test scale factor
-            TimeSpan testMedianFirstRetryDelay = TimeSpan.FromSeconds(2); // Set this to any other value to explore that the results scale properly for user choice of medianFirstRetryDelay.
+            TimeSpan testMedianFirstRetryDelay = TimeSpan.FromSeconds(1); // Set this to any other value to explore that the results scale properly for user choice of medianFirstRetryDelay.
 
             Console.WriteLine($"Computing median values (50th percentile) of retry delays, with Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds({testMedianFirstRetryDelay.TotalSeconds}, ...))." +
                               $"{Environment.NewLine}{nameof(maxRetries)}:{maxRetries}");
