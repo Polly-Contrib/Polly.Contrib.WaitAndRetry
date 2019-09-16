@@ -1,6 +1,6 @@
 # Polly.Contrib.WaitAndRetry
 
-Polly.Contrib.WaitAndRetry contains several helper methods for defining backoff strategies when using [Polly](http://www.thepollyproject.org/)'s wait-and-retry fault handling ability.
+Polly.Contrib.WaitAndRetry contains several helper methods for defining backoff strategies when using [Polly](https://github.com/App-vNext/Polly/)'s wait-and-retry fault handling ability.
 
 [![NuGet version](https://badge.fury.io/nu/Polly.Contrib.WaitAndRetry.svg)](https://badge.fury.io/nu/Polly.Contrib.WaitAndRetry) [![Build status](https://ci.appveyor.com/api/projects/status/5v3bpgjkw4snv3no?svg=true)](https://ci.appveyor.com/project/Polly-Contrib/polly-contrib-waitandretry) [![Slack Status](http://www.pollytalk.org/badge.svg)](http://www.pollytalk.org)
 
@@ -12,25 +12,29 @@ Polly.Contrib.WaitAndRetry contains several helper methods for defining backoff 
 
 One common approach when calling occasionally unreliable services is to wrap those calls in a retry policy. For example, if we're calling a remote service, we might choose to retry several times with a slight pause in between to account for infrastructure issues.
 
-We can define a policy to do this in Polly.
+We can define a policy to do this in [Polly](https://github.com/App-vNext/Polly/).
+
+While the core Polly package contains [core logic and gives examples for a variety of retry strategies](https://github.com/App-vNext/Polly#wait-and-retry), this Contrib packages up a variety of strategies in easy-to-use helper methods.
 
 ## Wait and Retry with Constant Back-off
 
 The following defines a policy that will retry five times and pause 200ms between each call.
 
-    Policy
-        .Handle<HttpRequestException>()
+    var retryPolicy = Policy
+        .Handle<FooException>()
         .WaitAndRetryAsync(retryCount: 5, retryNumber => TimeSpan.FromMilliseconds(200));
 
 We can simplify this by using the `ConstantBackoff` helper in Polly.Contrib.WaitAndRetry
 
     var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5);
 
-    Policy
-        .Handle<HttpRequestException>()
+    var retryPolicy = Policy
+        .Handle<FooException>()
         .WaitAndRetryAsync(delay);
 
 Note that `retryCount` must be greater than or equal to zero.
+
+### Retry first failure fast
 
 Additionally, when using the `ConstantBackoff` helper, or any other WaitAndRetry helper, we can signal that the first failure should retry immediately rather than waiting the indicated time. To do this, ensure the `fastFirst` parameter is `true`.
 
@@ -46,8 +50,8 @@ The first tool at our disposal is the `LinearBackoff` helper.
 
     var delay = Backoff.LinearBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5);
 
-    Policy
-        .Handle<HttpRequestException>()
+    var retryPolicy = Policy
+        .Handle<FooException>()
         .WaitAndRetryAsync(delay);
 
 This will create a linearly increasing retry delay of 100, 200, 300, 400, 500ms. 
@@ -66,8 +70,8 @@ We can also specify an exponential back-off where the delay duration is `initial
 
     var delay = Backoff.ExponentialBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5);
 
-    Policy
-        .Handle<HttpRequestException>()
+    var retryPolicy = Policy
+        .Handle<FooException>()
         .WaitAndRetryAsync(delay);
 
 This will create an exponentially increasing retry delay of 100, 200, 400, 800, 1600ms.
@@ -79,6 +83,16 @@ The default exponential growth factor is 2.0. However, can can provide our own.
 The upper for this retry with a growth factor of four is 25,600ms. Care and a calculator should be used when changing the factor.
 
 Note, the growth factor must be greater than or equal to one. A factor of one will return equivalent retry delays to the `ConstantBackoff` helper. 
+
+If the overall amount of time that an exponential-backoff retry policy could take is a concern, consider [placing a TimeoutPolicy outside the wait-and-retry policy](https://github.com/App-vNext/Polly/wiki/Timeout#combining-timeout-with-retries) using [PolicyWrap](https://github.com/App-vNext/Polly/wiki/PolicyWrap).  A timeout policy used in this way will limit the _overall_ execution time for all tries and waits-between-tries.  For instance, you could configure the exponential backoff for your wait-and-retry strategy to be 1, 2, 4, 8 seconds; and also impose an overall timeout, however many tries are invoked, at 45 seconds.  
+
+    var retryWithBackoff = Policy
+        .Handle<FooException>()
+        .WaitAndRetryAsync(Backoff.ExponentialBackoff(TimeSpan.FromSeconds(1), retryCount: 5));
+    var timeout = Policy.Timeout(TimeSpan.FromSeconds(45));
+    var retryWithBackoffAndOverallTimeout = timeout.Wrap(retryWithBackoff);
+
+When the combined time taken to make tries and wait between them exceeds 45 seconds, the TimeoutPolicy will be invoked and cause the current try and further retries to be abandoned.
 
 ## Wait and Retry with Jittered Back-off
 
@@ -110,6 +124,10 @@ Internally, the `DecorrelatedJitterBackoff` uses a shared `Random` to better ens
 
 The shared `Random` will still be used internally in this case, but it will be seeded with your value versus the default used by .NET in a call to `new Random()`
 
+## Sync and async compatible
+
+Examples in this readme show asynchronous Polly policies, but all backoff helpers in `Polly.Contrib.WaitAndRetry` also work with synchronous `.WaitAndRetry()`.
+
 ## Retry first failure fast
 
 All helper methods in Polly.Contrib.WaitAndRetry include an option to retry the first failure immediately. You can trigger this by passing in `fastFirst: true` to any of the helper methods.
@@ -117,6 +135,15 @@ All helper methods in Polly.Contrib.WaitAndRetry include an option to retry the 
     var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5, fastFirst: true);
 
 Note, the first retry will happen immediately and it will count against your retry count. That is, this will still retry five times but the first retry will happen immediately.
+
+The logic behind a fast first retry is that a failure may just have been a transient blip rather than reflecting a deeper underlying issue. In that case, trying again with no delay can be the fastest route to success.  In this view, it is worth starting to back off (introduce delays) after you have had _two_ failures, indicating a more serious underlying problem.
+
+## Credits
+
++ [@grant-d](https://github.com/grant-d): Original author of Polly.Contrib.WaitAndRetry.
++ [@george-polevoy](https://github.com/george-polevoy): Contributed the new jitter policy via [Polly/530](https://github.com/App-vNext/Polly/issues/530).
++ [@hyrmn](https://github.com/hyrmn): Added documentation.
++ [@reisenberger](https://github.com/reisenberger): Pulled the new jitter formula into the repo.
 
 ## Further Resources
 
