@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Polly.Contrib.WaitAndRetry.Specs.Utilities;
 using Xunit;
 
 namespace Polly.Contrib.WaitAndRetry.Specs
@@ -108,21 +109,22 @@ namespace Polly.Contrib.WaitAndRetry.Specs
                 }
                 else
                 {
-                    timeSpan.Should().BeGreaterOrEqualTo(minDelay);
-                    timeSpan.Should().BeLessOrEqualTo(maxDelay);
+                    timeSpan.ShouldBeBetweenOrEqualTo(minDelay, maxDelay);
                 }
             }
         }
 
-        [Fact]
-        public void Backoff_ResultIsInRange()
+        public static IEnumerable<object[]> SeedRange => Enumerable.Range(0, 1000).Select(o => new object[] { o }).ToArray();
+
+        [Theory]
+        [MemberData(nameof(SeedRange))]
+        public void Backoff_ResultIsInRange(int seed)
         {
             // Arrange
             var minDelay = TimeSpan.FromMilliseconds(10);
             var maxDelay = TimeSpan.FromMilliseconds(100);
             const int retryCount = 3;
             const bool fastFirst = false;
-            const int seed = 100;
 
             // Act
             IEnumerable<TimeSpan> result = Backoff.AwsDecorrelatedJitterBackoff(minDelay, maxDelay, retryCount, seed, fastFirst);
@@ -134,8 +136,7 @@ namespace Polly.Contrib.WaitAndRetry.Specs
 
             foreach (TimeSpan timeSpan in result)
             {
-                timeSpan.Should().BeGreaterOrEqualTo(minDelay);
-                timeSpan.Should().BeLessOrEqualTo(maxDelay);
+                timeSpan.ShouldBeBetweenOrEqualTo(minDelay, maxDelay);
             }
         }
     }
