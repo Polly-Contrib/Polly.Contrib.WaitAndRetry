@@ -100,37 +100,12 @@ namespace Polly.Contrib.WaitAndRetry.Specs
                 }
             }
         }
-
-        [Fact]
-        public void Backoff_ResultIsInRange()
-        {
-            // Arrange
-            var medianFirstDelay = TimeSpan.FromSeconds(1);
-            const int retryCount = 6;
-            const bool fastFirst = false;
-            const int seed = 23456;
-
-            // Act
-            IEnumerable<TimeSpan> result = Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay, retryCount, seed, fastFirst);
-
-            // Assert
-            result.Should().NotBeNull();
-            result = result.ToList();
-            result.Should().HaveCount(retryCount);
-
-            int t = 0;
-            foreach (TimeSpan timeSpan in result)
-            {
-                t++;
-                AssertOnRetryDelayForTry(t, timeSpan, medianFirstDelay);
-            }
-        }
-
+        
         public static IEnumerable<object[]> SeedRange => Enumerable.Range(0, 1000).Select(o => new object[] {o}).ToArray();
 
         [Theory]
         [MemberData(nameof(SeedRange))]
-        public void Backoff_ResultIsInRange_WideTest(int seed)
+        public void Backoff_ResultIsInRange(int seed)
         {
             // Arrange
             var medianFirstDelay = TimeSpan.FromSeconds(3);
