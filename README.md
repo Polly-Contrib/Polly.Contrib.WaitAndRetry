@@ -106,7 +106,7 @@ One way to address this is to add some randomness to the wait delay. This will c
 
 Following [exploration by Polly community members](https://github.com/App-vNext/Polly/issues/530), we now recommend a new jitter formula characterised by very smooth and even distribution of retry intervals, a well-controlled median initial retry delay, and broadly exponential backoff.
 
-    var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstDelay: TimeSpan.FromSeconds(1), retryCount: 5);
+    var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 5);
 
     var retryPolicy = Policy
         .Handle<FooException>()
