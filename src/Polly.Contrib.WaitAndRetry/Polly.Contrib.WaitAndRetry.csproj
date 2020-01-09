@@ -1,49 +1,52 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
     <AssemblyName>Polly.Contrib.WaitAndRetry</AssemblyName>
     <RootNamespace>Polly.Contrib.WaitAndRetry</RootNamespace>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Version>1.0.0-bumptov100-0001</Version>
+    <Version>1.1.0-v110_moderniseBuild</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <InformationalVersion>1.0.0.0</InformationalVersion>
-    <PackageVersion>1.0.0-bumptov100-0001</PackageVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <FileVersion>1.1.0.0</FileVersion>
+    <InformationalVersion>1.1.0.0</InformationalVersion>
+    <PackageVersion>1.1.0-v110_moderniseBuild</PackageVersion>
     <Authors>Grant Dickinson, App vNext</Authors>
     <Company>App vNext</Company>
-    <Copyright>Copyright (c) 2019, App vNext and contributors</Copyright>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <Copyright>Copyright (c) 2020, App vNext and contributors</Copyright>
+    <Description>Polly.Contrib.WaitAndRetry is an extension library for Polly containing helper methods for a variety of wait-and-retry strategies.</Description>
     <DefaultLanguage>en-US</DefaultLanguage>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugType>full</DebugType>
+  <PropertyGroup Label="SourceLink">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-
+  <ItemGroup Label="SourceLink">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <!-- The Polly dependency is artificial right now, nothing uses it. -->
     <!--<PackageReference Include="Polly" Version="7.1.0" />-->
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
+  </ItemGroup>
+  <PropertyGroup Label="NuspecProperties">
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <AssemblyTitle>Polly.Contrib.WaitAndRetry</AssemblyTitle>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <PackageIconUrl>https://raw.github.com/App-vNext/Polly/master/Polly.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/Polly-Contrib/Polly.Contrib.WaitAndRetry</PackageProjectUrl>
+    <PackageTags>Resilience Resiliency Fault-tolerance Transient-fault-handling Retry Retry-intervals Jitter</PackageTags>
+    <PackageReleaseNotes>See https://github.com/Polly-Contrib/Polly.Contrib.WaitAndRetry/blob/master/CHANGELOG.md for details</PackageReleaseNotes>
+  </PropertyGroup>
 </Project>
