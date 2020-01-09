@@ -5,11 +5,11 @@
     <AssemblyName>Polly.Contrib.WaitAndRetry</AssemblyName>
     <RootNamespace>Polly.Contrib.WaitAndRetry</RootNamespace>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <Version>1.1.0-v110_moderniseBuild</Version>
+    <Version>1.1.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
     <InformationalVersion>1.1.0.0</InformationalVersion>
-    <PackageVersion>1.1.0-v110_moderniseBuild</PackageVersion>
+    <PackageVersion>1.1.0</PackageVersion>
     <Authors>Grant Dickinson, App vNext</Authors>
     <Company>App vNext</Company>
     <Copyright>Copyright (c) 2020, App vNext and contributors</Copyright>
