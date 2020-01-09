@@ -26,6 +26,14 @@
         <!-- The Polly dependency is artificial right now, nothing uses it. -->
         <!-- <dependency id="Polly" version="7.1.0" /> -->
       </group>
+      <group targetFramework="net461">
+        <!-- The Polly dependency is artificial right now, nothing uses it. -->
+        <!-- <dependency id="Polly" version="7.1.0" /> -->
+      </group>
+      <group targetFramework="net472">
+        <!-- The Polly dependency is artificial right now, nothing uses it. -->
+        <!-- <dependency id="Polly" version="7.1.0" /> -->
+      </group>
     </dependencies>
   </metadata>
   <files>
