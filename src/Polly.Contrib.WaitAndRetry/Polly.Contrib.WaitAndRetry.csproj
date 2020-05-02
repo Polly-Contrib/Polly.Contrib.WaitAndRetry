@@ -40,6 +40,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
   </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Polly.Contrib.WaitAndRetry.Specs, PublicKey=00240000048000009400000006020000002400005253413100040000010001000da0771844e451d0e49809f724c45ab416fb6846b013a26a5c81b95b13f1231de7af634435318ac92d96f32e8d45e3f9668bff09e876d0fa84d01595e8117121152e7cecbc957bb8980562c73de847fdd36b3f8c78555a6dddf0986763ebd1cc7b4ac36757e3ac8548ef65addb6db87054759ffe131ae55b54690d5b96d4d1d5</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
   <PropertyGroup Label="NuspecProperties">
     <NeutralLanguage>en-US</NeutralLanguage>
     <AssemblyTitle>Polly.Contrib.WaitAndRetry</AssemblyTitle>
