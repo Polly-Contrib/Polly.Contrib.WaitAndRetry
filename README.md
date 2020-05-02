@@ -165,6 +165,20 @@ Internally, both jitter formulae uses a thread-safe, shared `Random` to better e
 
 The shared `Random` will still be used internally in this case, but it will be seeded with your value versus the default used by .NET in a call to `new Random()`
 
+### Using the new jitter formula with a large number of retries
+
+As the new jitter formula has (averaged over a suitably large sample) a `2^n` expotential backoff characteristic, configuring a large number of retries will naturally give rise to very long delays.  To prevent this, consider imposing a ceiling on retry delays:
+
+    var maxDelay = TimeSpan.FromSeconds(45);
+    var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 50)
+        .Select(s => TimeSpan.FromTicks(Math.Min(s.Ticks, maxDelay.Ticks)));
+
+    var retryPolicy = Policy
+        .Handle<FooException>()
+        .WaitAndRetryAsync(delay);
+
+While the ceiling imposed in the above code example is fixed, this should not generate corrlelated spikes of retries in a real environments, as the jitter provided by preceding tries (iterations of the formula prior to hitting the ceiling) should provide sufficient decorrelation.
+
 ## Sync and async compatible
 
 Examples in this readme show asynchronous Polly policies, but all backoff helpers in `Polly.Contrib.WaitAndRetry` also work with synchronous `.WaitAndRetry()`.
