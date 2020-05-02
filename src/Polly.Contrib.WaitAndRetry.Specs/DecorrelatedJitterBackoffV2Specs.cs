@@ -128,6 +128,23 @@ namespace Polly.Contrib.WaitAndRetry.Specs
             }
         }
 
+        [Fact]
+        public void Backoff_should_not_overflow_to_give_negative_timespan()
+        {
+            // See https://github.com/Polly-Contrib/Polly.Contrib.WaitAndRetry/issues/24
+
+            const int seed = 1;
+
+            // Arrange
+            IEnumerable<TimeSpan> delays = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 100, seed, fastFirst: false);
+
+            // Act.
+            foreach (TimeSpan span in delays)
+            {
+                span.Should().BeGreaterOrEqualTo(TimeSpan.Zero);
+            }
+        }
+
         private void AssertOnRetryDelayForTry(int t, TimeSpan calculatedDelay, TimeSpan medianFirstDelay)
         {
             /*testOutputHelper.WriteLine($"Try {t}, delay: {calculatedDelay.TotalSeconds} seconds; given median first delay {medianFirstDelay.TotalSeconds} seconds.");*/
