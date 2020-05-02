@@ -41,6 +41,11 @@ namespace Polly.Contrib.WaitAndRetry
                 // This factor allows the median values to fall approximately at 1, 2, 4 etc seconds, instead of 1.4, 2.8, 5.6, 11.2.
                 const double rpScalingFactor = 1 / 1.4d;
 
+                // Upper-bound to prevent overflow beyond TimeSpan.MaxValue. Potential truncation during conversion from double to long
+                // (as described at https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions)
+                // is avoided by the arbitrary subtraction of 1000. Validated by unit-test Backoff_should_not_overflow_to_give_negative_timespan.
+                double maxTimeSpanDouble = (double) TimeSpan.MaxValue.Ticks - 1000;
+
                 int i = 0;
                 if (fast)
                 {
@@ -57,7 +62,7 @@ namespace Polly.Contrib.WaitAndRetry
                     double next = Math.Pow(2, t) * Math.Tanh(Math.Sqrt(pFactor * t));
 
                     double formulaIntrinsicValue = next - prev;
-                    yield return TimeSpan.FromTicks((long)(formulaIntrinsicValue * rpScalingFactor * targetTicksFirstDelay));
+                    yield return TimeSpan.FromTicks((long)Math.Min(formulaIntrinsicValue * rpScalingFactor * targetTicksFirstDelay, maxTimeSpanDouble));
 
                     prev = next;
                 }
