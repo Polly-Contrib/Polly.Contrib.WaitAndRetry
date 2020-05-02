@@ -1,5 +1,9 @@
 # Polly.Contrib.WaitAndRetry changelog
 
+## 1.1.1
+- Strong-name the DLL in the nuget package.
+- Fix potential Timespan overflow, and add related guidance.
+
 ## 1.1.0
 - Extend tests on original jitter policy to cover range of seed values
 - Modernise build
