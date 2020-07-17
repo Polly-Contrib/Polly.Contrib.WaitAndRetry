@@ -89,8 +89,8 @@ If the overall amount of time that an exponential-backoff retry policy could tak
     var retryWithBackoff = Policy
         .Handle<FooException>()
         .WaitAndRetryAsync(Backoff.ExponentialBackoff(TimeSpan.FromSeconds(1), retryCount: 5));
-    var timeout = Policy.Timeout(TimeSpan.FromSeconds(45));
-    var retryWithBackoffAndOverallTimeout = timeout.Wrap(retryWithBackoff);
+    var timeout = Policy.TimeoutAsync(TimeSpan.FromSeconds(45));
+    var retryWithBackoffAndOverallTimeout = timeout.WrapAsync(retryWithBackoff);
 
 When the combined time taken to make tries and wait between them exceeds 45 seconds, the TimeoutPolicy will be invoked and cause the current try and further retries to be abandoned.
 
