@@ -6,7 +6,9 @@ Polly.Contrib.WaitAndRetry contains several helper methods for defining backoff 
 
 # Installing via NuGet
 
-    Install-Package Polly.Contrib.WaitAndRetry
+```powershell
+Install-Package Polly.Contrib.WaitAndRetry
+```
 
 # Usage
 
@@ -20,17 +22,21 @@ While the core Polly package contains [core logic and gives examples for a varie
 
 The following defines a policy that will retry five times and pause 200ms between each call.
 
-    var retryPolicy = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(retryCount: 5, retryNumber => TimeSpan.FromMilliseconds(200));
+```csharp
+var retryPolicy = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(retryCount: 5, retryNumber => TimeSpan.FromMilliseconds(200));
+```
 
 We can simplify this by using the `ConstantBackoff` helper in Polly.Contrib.WaitAndRetry
 
-    var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5);
+```csharp
+var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5);
 
-    var retryPolicy = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(delay);
+var retryPolicy = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(delay);
+```
 
 Note that `retryCount` must be greater than or equal to zero.
 
@@ -38,7 +44,9 @@ Note that `retryCount` must be greater than or equal to zero.
 
 Additionally, when using the `ConstantBackoff` helper, or any other WaitAndRetry helper, we can signal that the first failure should retry immediately rather than waiting the indicated time. To do this, ensure the `fastFirst` parameter is `true`.
 
-    var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5, fastFirst: true);
+```csharp
+var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5, fastFirst: true);
+```
 
 This will still retry five times but the first retry will happen immediately.
 
@@ -48,17 +56,21 @@ It can be desirable to wait increasingly long times between retries. For example
 
 The first tool at our disposal is the `LinearBackoff` helper.
 
-    var delay = Backoff.LinearBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5);
+```csharp
+var delay = Backoff.LinearBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5);
 
-    var retryPolicy = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(delay);
+var retryPolicy = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(delay);
+```
 
 This will create a linearly increasing retry delay of 100, 200, 300, 400, 500ms. 
 
 The default linear factor is 1.0. However, we can provide our own.
 
-    var delay = Backoff.LinearBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5, factor: 2);
+```csharp
+var delay = Backoff.LinearBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5, factor: 2);
+```
 
 This will create an increasing retry delay of 100, 300, 500, 700, 900ms.
 
@@ -68,17 +80,21 @@ Note, the linear factor must be greater than or equal to zero. A factor of zero 
 
 We can also specify an exponential back-off where the delay duration is `initialDelay x 2^iteration`. Because of the exponential nature, this is best used with a low starting delay or in out-of-band communication, such as a service worker polling for information from a remote endpoint. Due to the potential for rapidly increasing times, care should be taken if an exponential retry is used in the code path for servicing a user request.
 
-    var delay = Backoff.ExponentialBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5);
+```csharp
+var delay = Backoff.ExponentialBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5);
 
-    var retryPolicy = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(delay);
+var retryPolicy = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(delay);
+```
 
 This will create an exponentially increasing retry delay of 100, 200, 400, 800, 1600ms.
 
 The default exponential growth factor is 2.0. However, can can provide our own.
 
-    var delay = Backoff.ExponentialBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5, factor: 4);
+```csharp
+var delay = Backoff.ExponentialBackoff(TimeSpan.FromMilliseconds(100), retryCount: 5, factor: 4);
+```
 
 The upper for this retry with a growth factor of four is 25,600ms. Care and a calculator should be used when changing the factor.
 
@@ -86,11 +102,13 @@ Note, the growth factor must be greater than or equal to one. A factor of one wi
 
 If the overall amount of time that an exponential-backoff retry policy could take is a concern, consider [placing a TimeoutPolicy outside the wait-and-retry policy](https://github.com/App-vNext/Polly/wiki/Timeout#combining-timeout-with-retries) using [PolicyWrap](https://github.com/App-vNext/Polly/wiki/PolicyWrap).  A timeout policy used in this way will limit the _overall_ execution time for all tries and waits-between-tries.  For instance, you could configure the exponential backoff for your wait-and-retry strategy to be 1, 2, 4, 8 seconds; and also impose an overall timeout, however many tries are invoked, at 45 seconds.  
 
-    var retryWithBackoff = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(Backoff.ExponentialBackoff(TimeSpan.FromSeconds(1), retryCount: 5));
-    var timeout = Policy.Timeout(TimeSpan.FromSeconds(45));
-    var retryWithBackoffAndOverallTimeout = timeout.Wrap(retryWithBackoff);
+```csharp
+var retryWithBackoff = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(Backoff.ExponentialBackoff(TimeSpan.FromSeconds(1), retryCount: 5));
+var timeout = Policy.Timeout(TimeSpan.FromSeconds(45));
+var retryWithBackoffAndOverallTimeout = timeout.Wrap(retryWithBackoff);
+```
 
 When the combined time taken to make tries and wait between them exceeds 45 seconds, the TimeoutPolicy will be invoked and cause the current try and further retries to be abandoned.
 
@@ -106,11 +124,13 @@ One way to address this is to add some randomness to the wait delay. This will c
 
 Following [exploration by Polly community members](https://github.com/App-vNext/Polly/issues/530), we now recommend a new jitter formula characterised by very smooth and even distribution of retry intervals, a well-controlled median initial retry delay, and broadly exponential backoff.
 
-    var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 5);
+```csharp
+var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 5);
 
-    var retryPolicy = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(delay);
+var retryPolicy = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(delay);
+```
 
 #### Characteristics of the recommended jitter formula
 
@@ -136,11 +156,13 @@ The Polly team previously recommended the widely-referenced jitter strategy [des
 
 For completeness and for those wanting continuity with previous implementations, this is still available in Polly.Contrib.WaitAndRetry:
 
-    var delay = Backoff.AwsDecorrelatedJitterBackoff(minDelay: TimeSpan.FromMilliseconds(10), maxDelay: TimeSpan.FromMilliseconds(100), retryCount: 5);
+```csharp
+var delay = Backoff.AwsDecorrelatedJitterBackoff(minDelay: TimeSpan.FromMilliseconds(10), maxDelay: TimeSpan.FromMilliseconds(100), retryCount: 5);
 
-    var retryPolicy = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(delay);
+var retryPolicy = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(delay);
+```
 
 This will set up a policy that will retry five times. Each retry will delay for a random amount of time between the minimum of 10ms and the maximum of 100ms. 
 
@@ -158,10 +180,12 @@ The Polly team [reviewed the literature on Random on .Net](https://github.com/Ap
 
 Internally, both jitter formulae uses a thread-safe, shared `Random` to better ensure a random distribution across all calls. You may, optionally, provide your own seed value.
 
-    var delay = Backoff.DecorrelatedJitterBackoffV2(
-        medianFirstDelay: TimeSpan.FromSeconds(1), 
-        retryCount: 5, 
-        seed: 100);
+```csharp
+var delay = Backoff.DecorrelatedJitterBackoffV2(
+    medianFirstDelay: TimeSpan.FromSeconds(1), 
+    retryCount: 5, 
+    seed: 100);
+```
 
 The shared `Random` will still be used internally in this case, but it will be seeded with your value versus the default used by .NET in a call to `new Random()`
 
@@ -169,13 +193,15 @@ The shared `Random` will still be used internally in this case, but it will be s
 
 As the new jitter formula has (averaged over a suitably large sample) a `2^n` expotential backoff characteristic, configuring a large number of retries will naturally give rise to very long delays.  To prevent this, consider imposing a ceiling on retry delays:
 
-    var maxDelay = TimeSpan.FromSeconds(45);
-    var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 50)
-        .Select(s => TimeSpan.FromTicks(Math.Min(s.Ticks, maxDelay.Ticks)));
+```csharp
+var maxDelay = TimeSpan.FromSeconds(45);
+var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 50)
+    .Select(s => TimeSpan.FromTicks(Math.Min(s.Ticks, maxDelay.Ticks)));
 
-    var retryPolicy = Policy
-        .Handle<FooException>()
-        .WaitAndRetryAsync(delay);
+var retryPolicy = Policy
+    .Handle<FooException>()
+    .WaitAndRetryAsync(delay);
+```
 
 While the ceiling imposed in the above code example is fixed, this should not generate corrlelated spikes of retries in a real environments, as the jitter provided by preceding tries (iterations of the formula prior to hitting the ceiling) should provide sufficient decorrelation.
 
@@ -187,7 +213,9 @@ Examples in this readme show asynchronous Polly policies, but all backoff helper
 
 All helper methods in Polly.Contrib.WaitAndRetry include an option to retry the first failure immediately. You can trigger this by passing in `fastFirst: true` to any of the helper methods.
 
-    var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5, fastFirst: true);
+```csharp
+var delay = Backoff.ConstantBackoff(TimeSpan.FromMilliseconds(200), retryCount: 5, fastFirst: true);
+```
 
 Note, the first retry will happen immediately and it will count against your retry count. That is, this will still retry five times but the first retry will happen immediately.
 
